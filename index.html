@@ -28,6 +28,9 @@
             box-sizing: border-box;
             background: linear-gradient(135deg, #16213e 0%, #1a1a2e 100%);
             color: white;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
         }
         
         .slide.active {
@@ -68,7 +71,7 @@
             transition: all 0.3s ease;
             backdrop-filter: blur(5px);
             border: 1px solid rgba(255, 255, 255, 0.2);
-            display: none;
+            display: flex;
         }
         
         .nav-btn:hover {
@@ -312,9 +315,52 @@
             color: #00ff7f;
             font-weight: bold;
         }
+
+        /* Media query to hide nav buttons on larger screens */
+        @media (min-width: 768px) {
+            .nav-btn {
+                display: none;
+            }
+        }
+
+        /* Overlay for portrait mobile orientation */
+        #orientation-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 9999;
+            color: white;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+
+        @media screen and (orientation: portrait) and (max-width: 767px) {
+            #orientation-overlay {
+                display: flex;
+            }
+            /* Disable interaction with underlying content while overlay is active */
+            body > *:not(#orientation-overlay) {
+                pointer-events: none;
+                user-select: none;
+            }
+        }
     </style>
 </head>
 <body>
+    <!-- Orientation overlay for portrait mobile -->
+    <div id="orientation-overlay">
+        <div class="rotate-message">
+            <i class="fas fa-sync-alt fa-3x"></i>
+            <p>Vui lòng xoay thiết bị sang ngang để xem</p>
+        </div>
+    </div>
     <img src="fpt.png" alt="Logo" class="logo">
     
     <div class="progress-bar" id="progressBar"></div>
