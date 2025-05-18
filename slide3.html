@@ -1,0 +1,1188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stack Data Structure Presentation</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            overflow: hidden;
+            background-color: #1a1a2e;
+        }
+        
+        .slide {
+            width: 100vw;
+            height: 100vh;
+            position: absolute;
+            top: 0;
+            left: 0;
+            opacity: 0;
+            transition: all 1s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            transform: scale(0.95) rotate(-3deg);
+            padding: 40px;
+            box-sizing: border-box;
+            background: linear-gradient(135deg, #16213e 0%, #1a1a2e 100%);
+            color: white;
+        }
+        
+        .slide.active {
+            opacity: 1;
+            transform: scale(1) rotate(0deg);
+            z-index: 10;
+        }
+        
+        .slide.next {
+            transform: translateX(100%) scale(0.95) rotate(3deg);
+        }
+        
+        .slide.prev {
+            transform: translateX(-100%) scale(0.95) rotate(-3deg);
+        }
+        
+        .logo {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            width: 100px;
+            z-index: 100;
+        }
+        
+        .nav-btn {
+            position: fixed;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 60px;
+            height: 60px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            z-index: 100;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            display: none;
+        }
+        
+        .nav-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-50%) scale(1.1);
+        }
+        
+        .prev-btn {
+            left: 20px;
+        }
+        
+        .next-btn {
+            right: 20px;
+        }
+        
+        .progress-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            height: 5px;
+            background: linear-gradient(90deg, #00dbde 0%, #fc00ff 100%);
+            z-index: 100;
+            transition: width 0.3s ease;
+        }
+        
+        .section-title {
+            font-size: 3.5rem;
+            font-weight: 700;
+            background: linear-gradient(90deg, #00dbde 0%, #fc00ff 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+        
+        .content-box {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+            border-left: 5px solid #00dbde;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+        }
+        
+        .content-box:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 10px 25px rgba(0, 219, 222, 0.4);
+        }
+        
+        .bullet-item {
+            margin-bottom: 15px;
+            position: relative;
+            padding-left: 30px;
+            font-size: 1.1rem;
+            line-height: 1.6;
+        }
+        
+        .bullet-item:before {
+            content: "";
+            position: absolute;
+            left: 0;
+            top: 8px;
+            width: 12px;
+            height: 12px;
+            background: linear-gradient(135deg, #00dbde 0%, #fc00ff 100%);
+            border-radius: 50%;
+        }
+        
+        .team-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 25px;
+            text-align: center;
+            transition: all 0.3s ease;
+            border-top: 5px solid transparent;
+        }
+        
+        .team-card:hover {
+            transform: translateY(-10px) scale(1.03);
+            border-top: 5px solid #00dbde;
+            box-shadow: 0 10px 25px rgba(0, 219, 222, 0.5);
+            background: rgba(255, 255, 255, 0.1);
+        }
+        
+        .team-photo {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin: 0 auto 15px;
+            border: 5px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .toc-item {
+            padding: 15px 25px;
+            margin-bottom: 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            font-size: 1.2rem;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+        }
+        
+        .toc-item:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateX(15px) scale(1.03);
+            border-left: 4px solid #fc00ff;
+        }
+        
+        .toc-item .number {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #00dbde 0%, #fc00ff 100%);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-right: 15px;
+            font-weight: bold;
+        }
+        
+        .code-block {
+            background: #0f0c29;
+            border-radius: 10px;
+            padding: 15px;
+            font-family: 'Courier New', monospace;
+            overflow-x: auto;
+            margin: 20px 0;
+            border-left: 5px solid #fc00ff;
+        }
+        
+        .page-number {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.5);
+        }
+        
+        .reference {
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.5);
+            margin-top: 20px;
+            font-style: italic;
+        }
+        
+        .section-intro {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
+            text-align: center;
+        }
+        
+        .continue-btn {
+            margin-top: 40px;
+            padding: 12px 30px;
+            background: linear-gradient(90deg, #00dbde 0%, #fc00ff 100%);
+            border: none;
+            border-radius: 50px;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0, 219, 222, 0.3);
+        }
+        
+        .continue-btn:hover {
+            transform: translateY(-5px) scale(1.05);
+            box-shadow: 0 10px 25px rgba(0, 219, 222, 0.5);
+        }
+        
+        .highlight {
+            background: linear-gradient(90deg, #00dbde 0%, #fc00ff 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            font-weight: bold;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .animate-on-scroll {
+            animation-name: fadeInUp;
+            animation-duration: 0.7s;
+            animation-timing-function: ease-out;
+            animation-fill-mode: both;
+        }
+
+        .question-options li {
+            padding: 8px 12px;
+            margin-bottom: 8px;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.05);
+            transition: background 0.3s ease;
+            cursor: pointer;
+        }
+
+        .question-options li:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+        
+        .show-answer-btn {
+            margin-top: 20px;
+            padding: 10px 25px;
+            background: linear-gradient(90deg, #00c6ff 0%, #0072ff 100%);
+            border: none;
+            border-radius: 50px;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0, 114, 255, 0.3);
+        }
+
+        .show-answer-btn:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 8px 20px rgba(0, 114, 255, 0.4);
+        }
+
+        .correct-answer-text {
+            margin-top: 15px;
+            padding: 10px;
+            background: rgba(0, 255, 127, 0.1);
+            border-left: 4px solid #00ff7f;
+            border-radius: 5px;
+            color: #00ff7f;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <img src="fpt.png" alt="Logo" class="logo">
+    
+    <div class="progress-bar" id="progressBar"></div>
+    
+    <div class="nav-btn prev-btn" id="prevBtn">
+        <i class="fas fa-chevron-left text-white text-xl"></i>
+    </div>
+    
+    <div class="nav-btn next-btn" id="nextBtn">
+        <i class="fas fa-chevron-right text-white text-xl"></i>
+    </div>
+    
+    <!-- Title Slide -->
+    <div class="slide active" id="slide1">
+        <div class="flex flex-col items-center justify-center h-full">
+            <h1 class="text-6xl font-bold mb-8 text-center" style="background: linear-gradient(90deg, #00dbde 0%, #fc00ff 100%); -webkit-background-clip: text; background-clip: text; color: transparent;">
+                Stack Data Structure
+            </h1>
+            <p class="text-xl text-gray-300 mb-12">Understanding the LIFO Principle and Applications</p>
+            
+            <div class="flex space-x-8">
+                <div class="content-box w-64">
+                    <h3 class="text-xl font-semibold mb-4">Presented by</h3>
+                    <div class="flex items-center">
+                        <div class="w-12 h-12 bg-gradient-to-r from-cyan-500 to-purple-500 rounded-full mr-4"></div>
+                        <div>
+                            <p class="font-medium">GROUP 1</p>
+                            <p class="text-sm text-gray-400">SE1910</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="content-box w-64">
+                    <h3 class="text-xl font-semibold mb-4">Instructor</h3>
+                    <div class="flex items-center">
+                        <div>
+                            <p class="font-medium">DungLTP13</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <p class="text-gray-500 mt-16">Press the right arrow to continue</p>
+        </div>
+        <div class="page-number">1</div>
+    </div>
+    
+    <!-- Team Members Slide -->
+    <div class="slide" id="slide2">
+        <h1 class="section-title mb-12">Team Members</h1>
+        
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div class="team-card">
+                <h3 class="text-xl font-semibold mb-2">Nguyen Minh Quan</h3>
+            </div>
+            
+            <div class="team-card">
+                <h3 class="text-xl font-semibold mb-2">Tran Van Dat</h3>
+            </div>
+            
+            <div class="team-card">
+                <h3 class="text-xl font-semibold mb-2">Tran The Phong</h3>
+            </div>
+            
+            <div class="team-card">
+                <h3 class="text-xl font-semibold mb-2">Tran Nhat Duy</h3>
+            </div>
+            
+            <div class="team-card">
+                <h3 class="text-xl font-semibold mb-2">Nguyen Dong Lap</h3>
+            </div>
+            
+            <div class="team-card">
+                <h3 class="text-xl font-semibold mb-2">Tran Nguyen Ngoc Thi</h3>
+            </div>
+        </div>
+        <div class="page-number">2</div>
+    </div>
+    
+    <!-- Table of Contents -->
+    <div class="slide" id="slide3">
+        <h1 class="section-title mb-12">Presentation Outline</h1>
+        
+        <div class="max-w-3xl mx-auto">
+            <div class="toc-item" data-target="4">
+                <div class="number">1</div>
+                <div>
+                    <h3 class="font-semibold">What is a Stack?</h3>
+                    <p class="text-sm text-gray-400">Definition, LIFO principle, and basic operations</p>
+                </div>
+            </div>
+            
+            <div class="toc-item" data-target="6">
+                <div class="number">2</div>
+                <div>
+                    <h3 class="font-semibold">Applications of Stacks</h3>
+                    <p class="text-sm text-gray-400">Special problems and real-world use cases</p>
+                </div>
+            </div>
+            
+            <div class="toc-item" data-target="8">
+                <div class="number">3</div>
+                <div>
+                    <h3 class="font-semibold">Array-Based Implementation</h3>
+                    <p class="text-sm text-gray-400">Storage, operations, advantages and disadvantages</p>
+                </div>
+            </div>
+            
+            <div class="toc-item" data-target="10">
+                <div class="number">4</div>
+                <div>
+                    <h3 class="font-semibold">Linked List Implementation</h3>
+                    <p class="text-sm text-gray-400">Singly linked list approach and adapter pattern</p>
+                </div>
+            </div>
+            
+            <div class="toc-item" data-target="12">
+                <div class="number">5</div>
+                <div>
+                    <h3 class="font-semibold">Reversing an Array</h3>
+                    <p class="text-sm text-gray-400">Practical application of stack operations</p>
+                </div>
+            </div>
+            
+            <div class="toc-item" data-target="14">
+                <div class="number">6</div>
+                <div>
+                    <h3 class="font-semibold">Matching Parentheses & HTML Tags</h3>
+                    <p class="text-sm text-gray-400">Stack-based validation algorithms</p>
+                </div>
+            </div>
+        </div>
+        <div class="page-number">3</div>
+    </div>
+    
+    <!-- Section Intro: What is a Stack? -->
+    <div class="slide" id="slide4">
+        <div class="section-intro">
+            <h1 class="text-6xl font-bold mb-8 text-center highlight">1. What is a Stack?</h1>
+            <p class="text-xl text-gray-300 max-w-2xl text-center mb-12">
+                Understanding the fundamental LIFO principle and basic operations that define stack data structures
+            </p>
+            <button class="continue-btn" onclick="goToNextSlide()">
+                Continue to Content <i class="fas fa-arrow-right ml-2"></i>
+            </button>
+        </div>
+        <div class="page-number">4</div>
+    </div>
+    
+    <!-- What is a Stack? Content -->
+    <div class="slide" id="slide5">
+        <h1 class="section-title">1. What is a Stack?</h1>
+        
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-8">
+            <div class="content-box">
+                <h2 class="text-2xl font-semibold mb-4">Definition</h2>
+                <p class="mb-6">A <span class="highlight">stack</span> is a collection of objects that follows the <span class="highlight">Last-In, First-Out (LIFO)</span> principle.</p>
+                
+                <div class="flex justify-center mb-6">
+                    <div class="w-32 h-48 bg-gray-800 rounded-lg border-2 border-gray-700 flex flex-col-reverse items-center p-2">
+                        <div class="w-full h-8 bg-gradient-to-r from-cyan-500 to-blue-500 rounded mb-1"></div>
+                        <div class="w-full h-8 bg-gradient-to-r from-blue-500 to-purple-500 rounded mb-1"></div>
+                        <div class="w-full h-8 bg-gradient-to-r from-purple-500 to-pink-500 rounded"></div>
+                    </div>
+                </div>
+                
+                <p>The last element added to the stack will be the first one to be removed.</p>
+            </div>
+            
+            <div class="content-box">
+                <h2 class="text-2xl font-semibold mb-4">Basic Operations</h2>
+                
+                <div class="bullet-item"><span class="font-semibold">push(e):</span> Add an element to the top of the stack</div>
+                <div class="bullet-item"><span class="font-semibold">pop():</span> Remove and return the top element from the stack</div>
+                <div class="bullet-item"><span class="font-semibold">top():</span> View the top element without removing it</div>
+                <div class="bullet-item"><span class="font-semibold">size():</span> Get the number of elements in the stack</div>
+                <div class="bullet-item"><span class="font-semibold">isEmpty():</span> Check if the stack is empty</div>
+                
+                <div class="reference">
+                    Reference pages: 226, 227
+                </div>
+            </div>
+        </div>
+        <div class="page-number">5</div>
+    </div>
+    
+    <!-- Section Intro: Applications of Stacks -->
+    <div class="slide" id="slide6">
+        <div class="section-intro">
+            <h1 class="text-6xl font-bold mb-8 text-center highlight">2. Applications of Stacks</h1>
+            <p class="text-xl text-gray-300 max-w-2xl text-center mb-12">
+                Exploring real-world problems that can be elegantly solved using stack data structures
+            </p>
+            <button class="continue-btn" onclick="goToNextSlide()">
+                Continue to Content <i class="fas fa-arrow-right ml-2"></i>
+            </button>
+        </div>
+        <div class="page-number">6</div>
+    </div>
+    
+    <!-- Applications of Stacks Content -->
+    <div class="slide" id="slide7">
+        <h1 class="section-title">2. Applications of Stacks</h1>
+        
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-8">
+            <div class="content-box">
+                <h2 class="text-2xl font-semibold mb-4">Common Use Cases</h2>
+                
+                <div class="bullet-item">
+                    <span class="font-semibold">Web browser history ("Back" button):</span>
+                    <p class="text-gray-400 mt-1">Each visited page is pushed onto a stack. The "Back" button pops the stack to return to previous pages.</p>
+                </div>
+                
+                <div class="bullet-item">
+                    <span class="font-semibold">"Undo" mechanism in text editors:</span>
+                    <p class="text-gray-400 mt-1">Each action is pushed onto a stack. "Undo" pops the last action and reverses it.</p>
+                </div>
+                
+                <div class="bullet-item">
+                    <span class="font-semibold">Reversing an array:</span>
+                    <p class="text-gray-400 mt-1">Push all elements onto a stack, then pop them back into the array in reverse order.</p>
+                </div>
+                
+                <div class="bullet-item">
+                    <span class="font-semibold">Matching parentheses and HTML tags:</span>
+                    <p class="text-gray-400 mt-1">Stack helps validate proper nesting and matching of symbols.</p>
+                </div>
+                
+                <div class="reference">
+                    Reference pages: 226, 234, 235
+                </div>
+            </div>
+            
+            <div class="content-box">
+                <h2 class="text-2xl font-semibold mb-4">Visual Example</h2>
+                
+                <div class="flex justify-center items-center h-full">
+                    <div class="text-center">
+                        <div class="w-64 h-48 bg-gray-800 rounded-lg border-2 border-gray-700 flex flex-col-reverse items-center p-2 mb-6">
+                            <div class="w-full h-8 bg-gradient-to-r from-cyan-500 to-blue-500 rounded mb-1 flex items-center justify-center text-white text-xs">Page 1</div>
+                            <div class="w-full h-8 bg-gradient-to-r from-blue-500 to-purple-500 rounded mb-1 flex items-center justify-center text-white text-xs">Page 2</div>
+                            <div class="w-full h-8 bg-gradient-to-r from-purple-500 to-pink-500 rounded flex items-center justify-center text-white text-xs">Page 3</div>
+                        </div>
+                        <p class="text-gray-400">Browser history stack (LIFO principle)</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="page-number">7</div>
+    </div>
+    
+    <!-- Section Intro: Array-Based Implementation -->
+    <div class="slide" id="slide8">
+        <div class="section-intro">
+            <h1 class="text-6xl font-bold mb-8 text-center highlight">3. Array-Based Implementation</h1>
+            <p class="text-xl text-gray-300 max-w-2xl text-center mb-12">
+                How to implement a stack using arrays with fixed capacity
+            </p>
+            <button class="continue-btn" onclick="goToNextSlide()">
+                Continue to Content <i class="fas fa-arrow-right ml-2"></i>
+            </button>
+        </div>
+        <div class="page-number">8</div>
+    </div>
+    
+    <!-- Array-Based Implementation Content -->
+    <div class="slide" id="slide9">
+        <h1 class="section-title">3. Array-Based Stack</h1>
+        
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-8">
+            <div class="content-box">
+                <h2 class="text-2xl font-semibold mb-4">Implementation Details</h2>
+                
+                <div class="bullet-item">
+                    <span class="font-semibold">Storage:</span> Array data with fixed capacity N
+                </div>
+                
+                <div class="bullet-item">
+                    <span class="font-semibold">Stack top:</span> data[t] where t = size - 1
+                </div>
+                
+                <div class="bullet-item">
+                    <span class="font-semibold">push(e):</span> Increment t, assign e to data[t]
+                </div>
+                
+                <div class="bullet-item">
+                    <span class="font-semibold">pop():</span> Retrieve data[t], set data[t] = null, decrement t
+                </div>
+                
+                <h3 class="text-xl font-semibold mt-6 mb-2">Advantages</h3>
+                <p class="text-gray-400">Simple, efficient (O(1) for operations)</p>
+                
+                <h3 class="text-xl font-semibold mt-4 mb-2">Disadvantages</h3>
+                <p class="text-gray-400">Fixed capacity</p>
+                
+                <div class="reference">
+                    Reference pages: 230, 231
+                </div>
+            </div>
+            
+            <div class="content-box">
+                <h2 class="text-2xl font-semibold mb-4">Code Example</h2>
+                
+                <div class="code-block">
+                    <pre><code class="text-gray-300">
+public class ArrayStack&lt;E&gt; {
+    private E[] data;
+    private int t = -1;
+    
+    public ArrayStack(int capacity) {
+        data = (E[]) new Object[capacity];
+    }
+    
+    public void push(E e) {
+        if (size() == data.length)
+            throw new IllegalStateException("Stack is full");
+        data[++t] = e;
+    }
+    
+    public E pop() {
+        if (isEmpty()) return null;
+        E answer = data[t];
+        data[t] = null;
+        t--;
+        return answer;
+    }
+    
+    public int size() { return t + 1; }
+    public boolean isEmpty() { return t == -1; }
+    public E top() { return isEmpty() ? null : data[t]; }
+}
+                    </code></pre>
+                </div>
+                
+                <div class="flex justify-center mt-4">
+                    <div class="w-48 h-32 bg-gray-800 rounded-lg border-2 border-gray-700 flex flex-col-reverse items-center p-2">
+                        <div class="w-full h-6 bg-gray-700 rounded mb-1 text-center text-xs text-gray-400">index 0</div>
+                        <div class="w-full h-6 bg-gray-700 rounded mb-1 text-center text-xs text-gray-400">index 1</div>
+                        <div class="w-full h-6 bg-blue-500 rounded text-center text-xs text-white">top (index 2)</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="page-number">9</div>
+    </div>
+    
+    <!-- Section Intro: Linked List Implementation -->
+    <div class="slide" id="slide10">
+        <div class="section-intro">
+            <h1 class="text-6xl font-bold mb-8 text-center highlight">4. Linked List Implementation</h1>
+            <p class="text-xl text-gray-300 max-w-2xl text-center mb-12">
+                Dynamic stack implementation using singly linked lists
+            </p>
+            <button class="continue-btn" onclick="goToNextSlide()">
+                Continue to Content <i class="fas fa-arrow-right ml-2"></i>
+            </button>
+        </div>
+        <div class="page-number">10</div>
+    </div>
+    
+    <!-- Linked List Implementation Content -->
+    <div class="slide" id="slide11">
+        <h1 class="section-title">4. Singly Linked List Stack</h1>
+        
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-8">
+            <div class="content-box">
+                <h2 class="text-2xl font-semibold mb-4">Implementation Details</h2>
+                
+                <div class="bullet-item">
+                    <span class="font-semibold">Storage:</span> Singly linked list
+                </div>
+                
+                <div class="bullet-item">
+                    <span class="font-semibold">Stack top:</span> Front element of the list
+                </div>
+                
+                <div class="bullet-item">
+                    <span class="font-semibold">Adapter Pattern:</span> LinkedStack class contains SinglyLinkedList
+                </div>
+                
+                <div class="bullet-item">
+                    <span class="font-semibold">push(e):</span> list.addFirst(e)
+                </div>
+                
+                <div class="bullet-item">
+                    <span class="font-semibold">pop():</span> list.removeFirst()
+                </div>
+                
+                <h3 class="text-xl font-semibold mt-6 mb-2">Advantages</h3>
+                <p class="text-gray-400">Dynamic size, O(1) operations</p>
+                
+                <h3 class="text-xl font-semibold mt-4 mb-2">Disadvantages</h3>
+                <p class="text-gray-400">More memory for pointers</p>
+                
+                <div class="reference">
+                    Reference page: 233
+                </div>
+            </div>
+            
+            <div class="content-box">
+                <h2 class="text-2xl font-semibold mb-4">Code Example</h2>
+                
+                <div class="code-block">
+                    <pre><code class="text-gray-300">
+public class LinkedStack&lt;E&gt; {
+    private SinglyLinkedList&lt;E&gt; list = new SinglyLinkedList<>();
+    
+    public LinkedStack() {}
+    
+    public void push(E e) {
+        list.addFirst(e);
+    }
+    
+    public E pop() {
+        return list.removeFirst();
+    }
+    
+    public E top() {
+        return list.first();
+    }
+    
+    public int size() {
+        return list.size();
+    }
+    
+    public boolean isEmpty() {
+        return list.isEmpty();
+    }
+}
+                    </code></pre>
+                </div>
+                
+                <div class="flex justify-center mt-4">
+                    <div class="flex items-center">
+                        <div class="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center text-white text-xs">top</div>
+                        <div class="w-16 h-1 bg-gray-600"></div>
+                        <div class="w-8 h-8 bg-gray-600 rounded-full"></div>
+                        <div class="w-16 h-1 bg-gray-600"></div>
+                        <div class="w-8 h-8 bg-gray-600 rounded-full"></div>
+                    </div>
+                </div>
+                <p class="text-center text-gray-400 mt-2">Linked list visualization</p>
+            </div>
+        </div>
+        <div class="page-number">11</div>
+    </div>
+    
+    <!-- Section Intro: Reversing an Array -->
+    <div class="slide" id="slide12">
+        <div class="section-intro">
+            <h1 class="text-6xl font-bold mb-8 text-center highlight">5. Reversing an Array</h1>
+            <p class="text-xl text-gray-300 max-w-2xl text-center mb-12">
+                Practical application of stack operations to reverse element order
+            </p>
+            <button class="continue-btn" onclick="goToNextSlide()">
+                Continue to Content <i class="fas fa-arrow-right ml-2"></i>
+            </button>
+        </div>
+        <div class="page-number">12</div>
+    </div>
+    
+    <!-- Reversing an Array Content -->
+    <div class="slide" id="slide13">
+        <h1 class="section-title">5. Reversing an Array Using a Stack</h1>
+        
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-8">
+            <div class="content-box">
+                <h2 class="text-2xl font-semibold mb-4">Principle</h2>
+                <p class="mb-6">The <span class="highlight">LIFO</span> property of stacks naturally helps reverse the order of elements.</p>
+                
+                <h2 class="text-2xl font-semibold mb-4">Steps</h2>
+                
+                <div class="bullet-item">
+                    <span class="font-semibold">1. Push all array elements onto the stack</span>
+                </div>
+                
+                <div class="bullet-item">
+                    <span class="font-semibold">2. Pop elements from the stack and write them back into the array</span>
+                </div>
+                
+                <div class="bullet-item">
+                    <span class="font-semibold">Result:</span> The array is reversed
+                </div>
+                
+                <div class="reference">
+                    Reference page: 234
+                </div>
+            </div>
+            
+            <div class="content-box">
+                <h2 class="text-2xl font-semibold mb-4">Visualization</h2>
+                
+                <div class="flex flex-col items-center">
+                    <div class="flex mb-8">
+                        <div class="mr-4">
+                            <p class="text-center mb-2">Original Array</p>
+                            <div class="flex">
+                                <div class="w-10 h-10 bg-blue-500 flex items-center justify-center text-white font-bold border border-blue-600">A</div>
+                                <div class="w-10 h-10 bg-blue-500 flex items-center justify-center text-white font-bold border border-blue-600">B</div>
+                                <div class="w-10 h-10 bg-blue-500 flex items-center justify-center text-white font-bold border border-blue-600">C</div>
+                                <div class="w-10 h-10 bg-blue-500 flex items-center justify-center text-white font-bold border border-blue-600">D</div>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <p class="text-center mb-2">Reversed Array</p>
+                            <div class="flex">
+                                <div class="w-10 h-10 bg-purple-500 flex items-center justify-center text-white font-bold border border-purple-600">D</div>
+                                <div class="w-10 h-10 bg-purple-500 flex items-center justify-center text-white font-bold border border-purple-600">C</div>
+                                <div class="w-10 h-10 bg-purple-500 flex items-center justify-center text-white font-bold border border-purple-600">B</div>
+                                <div class="w-10 h-10 bg-purple-500 flex items-center justify-center text-white font-bold border border-purple-600">A</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="w-48 h-48 bg-gray-800 rounded-lg border-2 border-gray-700 flex flex-col-reverse items-center p-2 mb-4">
+                        <div class="w-full h-8 bg-gradient-to-r from-cyan-500 to-blue-500 rounded mb-1 flex items-center justify-center text-white text-xs">A</div>
+                        <div class="w-full h-8 bg-gradient-to-r from-blue-500 to-purple-500 rounded mb-1 flex items-center justify-center text-white text-xs">B</div>
+                        <div class="w-full h-8 bg-gradient-to-r from-purple-500 to-pink-500 rounded mb-1 flex items-center justify-center text-white text-xs">C</div>
+                        <div class="w-full h-8 bg-gradient-to-r from-pink-500 to-red-500 rounded flex items-center justify-center text-white text-xs">D</div>
+                    </div>
+                    <p class="text-gray-400">Stack during the reversal process</p>
+                </div>
+            </div>
+        </div>
+        <div class="page-number">13</div>
+    </div>
+    
+    <!-- Section Intro: Matching Parentheses & HTML Tags -->
+    <div class="slide" id="slide14">
+        <div class="section-intro">
+            <h1 class="text-6xl font-bold mb-8 text-center highlight">6. Matching Parentheses &amp; HTML Tags</h1>
+            <p class="text-xl text-gray-300 max-w-2xl text-center mb-12">
+                Stack-based validation algorithms for structured documents
+            </p>
+            <button class="continue-btn" onclick="goToNextSlide()">
+                Continue to Content <i class="fas fa-arrow-right ml-2"></i>
+            </button>
+        </div>
+        <div class="page-number">14</div>
+    </div>
+    
+    <!-- Matching Parentheses & HTML Tags Content -->
+    <div class="slide" id="slide15">
+        <h1 class="section-title">6. Matching Parentheses &amp; HTML Tags</h1>
+        
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-8">
+            <div class="content-box">
+                <h2 class="text-2xl font-semibold mb-4">Parentheses Matching</h2>
+                
+                <div class="bullet-item">
+                    <span class="font-semibold">Check correctness of (), {}, []</span>
+                </div>
+                
+                <div class="bullet-item">
+                    <span class="font-semibold">Algorithm:</span>
+                    <ul class="list-disc list-inside mt-2 ml-4 text-gray-400">
+                        <li>Encounter opening symbol: push</li>
+                        <li>Encounter closing symbol: pop and match</li>
+                        <li>End of string, empty stack means valid</li>
+                    </ul>
+                </div>
+                
+                <div class="code-block mt-4">
+                    <pre><code class="text-gray-300">
+function isValidParentheses(s) {
+    let stack = [];
+    let map = {')': '(', '}': '{', ']': '['};
+    
+    for (let char of s) {
+        if (!map[char]) {
+            stack.push(char);
+        } else if (stack.pop() !== map[char]) {
+            return false;
+        }
+    }
+    return stack.length === 0;
+}
+                    </code></pre>
+                </div>
+            </div>
+            
+            <div class="content-box">
+                <h2 class="text-2xl font-semibold mb-4">HTML Tags Matching</h2>
+                
+                <div class="bullet-item">
+                    <span class="font-semibold">Check pairs &lt;name&gt; and &lt;/name&gt;</span>
+                </div>
+                
+                <div class="bullet-item">
+                    <span class="font-semibold">Similar to parentheses:</span>
+                    <ul class="list-disc list-inside mt-2 ml-4 text-gray-400">
+                        <li>Push opening tag name</li>
+                        <li>Pop and match with closing tag</li>
+                    </ul>
+                </div>
+                
+                <div class="code-block mt-4">
+                    <pre><code class="text-gray-300">
+function isValidHTML(html) {
+    let stack = [];
+    let tagRegex = /&lt;(\/?)(\w+)[^>]*>/g;
+    let match;
+    
+    while ((match = tagRegex.exec(html)) !== null) {
+        if (match[1] === '') { // Opening tag
+            stack.push(match[2]);
+        } else { // Closing tag
+            if (stack.pop() !== match[2]) {
+                return false;
+            }
+        }
+    }
+    return stack.length === 0;
+}
+                    </code></pre>
+                </div>
+                
+                <div class="reference">
+                    Reference pages: 235, 236, 237
+                </div>
+            </div>
+        </div>
+        <div class="page-number">15</div>
+    </div>
+    
+    <!-- Summary Slide -->
+    <div class="slide" id="slide16">
+        <div class="flex flex-col items-center justify-center h-full">
+            <h1 class="text-6xl font-bold mb-8 text-center" style="background: linear-gradient(90deg, #00dbde 0%, #fc00ff 100%); -webkit-background-clip: text; background-clip: text; color: transparent;">
+                7. Summary
+            </h1>
+            
+            <div class="max-w-4xl bg-gray-800 rounded-xl p-8 shadow-2xl">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="bg-gray-700 p-4 rounded-lg">
+                        <h3 class="text-xl font-semibold mb-3 text-blue-400">Key Concepts</h3>
+                        <ul class="space-y-2">
+                            <li class="flex items-start">
+                                <i class="fas fa-check-circle text-green-400 mt-1 mr-2"></i>
+                                <span>Stack follows LIFO principle</span>
+                            </li>
+                            <li class="flex items-start">
+                                <i class="fas fa-check-circle text-green-400 mt-1 mr-2"></i>
+                                <span>Basic operations: push, pop, top, size, isEmpty</span>
+                            </li>
+                            <li class="flex items-start">
+                                <i class="fas fa-check-circle text-green-400 mt-1 mr-2"></i>
+                                <span>Can be implemented with arrays or linked lists</span>
+                            </li>
+                        </ul>
+                    </div>
+                    
+                    <div class="bg-gray-700 p-4 rounded-lg">
+                        <h3 class="text-xl font-semibold mb-3 text-purple-400">Applications</h3>
+                        <ul class="space-y-2">
+                            <li class="flex items-start">
+                                <i class="fas fa-check-circle text-green-400 mt-1 mr-2"></i>
+                                <span>Browser history and undo operations</span>
+                            </li>
+                            <li class="flex items-start">
+                                <i class="fas fa-check-circle text-green-400 mt-1 mr-2"></i>
+                                <span>Reversing data sequences</span>
+                            </li>
+                            <li class="flex items-start">
+                                <i class="fas fa-check-circle text-green-400 mt-1 mr-2"></i>
+                                <span>Syntax validation (parentheses, HTML tags)</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="mt-8 text-center">
+                    <h3 class="text-2xl font-semibold mb-4">Thank You!</h3>
+                    <p class="text-gray-400 mb-6">Any questions?</p>
+                    
+                    <div class="flex justify-center space-x-4">
+                        <div class="w-12 h-12 bg-gradient-to-r from-cyan-500 to-blue-500 rounded-full flex items-center justify-center text-white">
+                            <i class="fab fa-github"></i>
+                        </div>
+                        <div class="w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center text-white">
+                            <i class="fab fa-linkedin-in"></i>
+                        </div>
+                        <div class="w-12 h-12 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center text-white">
+                            <i class="fas fa-envelope"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="page-number">16</div>
+    </div>
+    
+    <!-- Question 1 Slide -->
+    <div class="slide" id="slide17">
+        <h1 class="section-title mb-8">Question 1 <span class="text-2xl font-normal text-gray-400">(of 5)</span></h1>
+        <div class="max-w-3xl mx-auto">
+            <div class="content-box">
+                <h3 class="text-2xl font-semibold mb-6">What is a Stack, and what is its primary operating principle?</h3>
+                <ul class="question-options space-y-2 text-lg">
+                    <li>A. A Stack is a data structure that operates on the FIFO (First-In, First-Out) principle.</li>
+                    <li>B. A Stack is a data structure that operates on the LIFO (Last-In, First-Out) principle.</li>
+                    <li>C. A Stack is a doubly linked list allowing insertion and deletion at both ends.</li>
+                    <li>D. A Stack is an array with unlimited capacity, operating randomly.</li>
+                </ul>
+                <button class="show-answer-btn">Show Answer</button>
+                <div class="correct-answer-text" style="display: none;">Correct Answer: B</div>
+            </div>
+        </div>
+        <div class="page-number">17</div>
+    </div>
+
+    <!-- Question 2 Slide -->
+    <div class="slide" id="slide18">
+        <h1 class="section-title mb-8">Question 2 <span class="text-2xl font-normal text-gray-400">(of 5)</span></h1>
+        <div class="max-w-3xl mx-auto">
+            <div class="content-box">
+                <h3 class="text-2xl font-semibold mb-6">Which of the following is NOT a typical application of a Stack?</h3>
+                <ul class="question-options space-y-2 text-lg">
+                    <li>A. The "Back" function in a web browser.</li>
+                    <li>B. The "Undo" mechanism in a text editor.</li>
+                    <li>C. Sorting an array in ascending order.</li>
+                    <li>D. Checking the balance of parentheses in a mathematical expression.</li>
+                </ul>
+                <button class="show-answer-btn">Show Answer</button>
+                <div class="correct-answer-text" style="display: none;">Correct Answer: C</div>
+            </div>
+        </div>
+        <div class="page-number">18</div>
+    </div>
+
+    <!-- Question 3 Slide -->
+    <div class="slide" id="slide19">
+        <h1 class="section-title mb-8">Question 3 <span class="text-2xl font-normal text-gray-400">(of 5)</span></h1>
+        <div class="max-w-3xl mx-auto">
+            <div class="content-box">
+                <h3 class="text-2xl font-semibold mb-6">When implementing a Stack using an array, what happens if you attempt to perform a push(e) operation when the Stack is full?</h3>
+                <ul class="question-options space-y-2 text-lg">
+                    <li>A. The element e is added to the bottom of the Stack.</li>
+                    <li>B. An IllegalStateException is thrown.</li>
+                    <li>C. The Stack automatically increases its size to accommodate element e.</li>
+                    <li>D. The element e is added without any error.</li>
+                </ul>
+                <button class="show-answer-btn">Show Answer</button>
+                <div class="correct-answer-text" style="display: none;">Correct Answer: B</div>
+            </div>
+        </div>
+        <div class="page-number">19</div>
+    </div>
+
+    <!-- Question 4 Slide -->
+    <div class="slide" id="slide20">
+        <h1 class="section-title mb-8">Question 4 <span class="text-2xl font-normal text-gray-400">(of 5)</span></h1>
+        <div class="max-w-3xl mx-auto">
+            <div class="content-box">
+                <h3 class="text-2xl font-semibold mb-6">When implementing a Stack using a singly linked list, which operation has a time complexity of O(1)?</h3>
+                <ul class="question-options space-y-2 text-lg">
+                    <li>A. Adding an element to the end of the linked list (addLast).</li>
+                    <li>B. Removing an element from the end of the linked list (removeLast).</li>
+                    <li>C. Adding an element to the beginning of the linked list (addFirst).</li>
+                    <li>D. Searching for an element in the linked list.</li>
+                </ul>
+                <button class="show-answer-btn">Show Answer</button>
+                <div class="correct-answer-text" style="display: none;">Correct Answer: C</div>
+            </div>
+        </div>
+        <div class="page-number">20</div>
+    </div>
+
+    <!-- Question 5 Slide -->
+    <div class="slide" id="slide21">
+        <h1 class="section-title mb-8">Question 5 <span class="text-2xl font-normal text-gray-400">(of 5)</span></h1>
+        <div class="max-w-3xl mx-auto">
+            <div class="content-box">
+                <h3 class="text-2xl font-semibold mb-6">In the algorithm for checking balanced parentheses using a Stack, what does it mean if the Stack is not empty after processing the entire expression?</h3>
+                <ul class="question-options space-y-2 text-lg">
+                    <li>A. The expression is considered valid.</li>
+                    <li>B. The expression is invalid because there are unmatched opening parentheses.</li>
+                    <li>C. The Stack automatically clears its remaining elements to make the expression valid.</li>
+                    <li>D. The algorithm restarts from the beginning to recheck the expression.</li>
+                </ul>
+                <button class="show-answer-btn">Show Answer</button>
+                <div class="correct-answer-text" style="display: none;">Correct Answer: B</div>
+            </div>
+        </div>
+        <div class="page-number">21</div>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const slides = document.querySelectorAll('.slide');
+            const prevBtn = document.getElementById('prevBtn');
+            const nextBtn = document.getElementById('nextBtn');
+            const progressBar = document.getElementById('progressBar');
+            let currentSlide = 0;
+            
+            // Initialize slides
+            function showSlide(index) {
+                slides.forEach((slide, i) => {
+                    slide.classList.remove('active', 'next', 'prev');
+                    
+                    if (i === index) {
+                        slide.classList.add('active');
+                    } else if (i > index) {
+                        slide.classList.add('next');
+                    } else {
+                        slide.classList.add('prev');
+                    }
+                });
+                
+                // Update progress bar
+                const progress = ((index + 1) / slides.length) * 100;
+                progressBar.style.width = `${progress}%`;
+                
+                currentSlide = index;
+            }
+            
+            // Navigation functions
+            function goToPrevSlide() {
+                if (currentSlide > 0) {
+                    showSlide(currentSlide - 1);
+                }
+            }
+            
+            function goToNextSlide() {
+                if (currentSlide < slides.length - 1) {
+                    showSlide(currentSlide + 1);
+                }
+            }
+            
+            // Event listeners
+            prevBtn.addEventListener('click', goToPrevSlide);
+            nextBtn.addEventListener('click', goToNextSlide);
+            
+            // Keyboard navigation
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'ArrowLeft') {
+                    goToPrevSlide();
+                } else if (e.key === 'ArrowRight') {
+                    goToNextSlide();
+                }
+            });
+            
+            // Table of content items click handler
+            document.querySelectorAll('.toc-item').forEach(item => {
+                item.addEventListener('click', function() {
+                    const targetSlide = parseInt(this.getAttribute('data-target'));
+                    showSlide(targetSlide);
+                });
+            });
+            
+            // Initialize first slide
+            showSlide(0);
+            
+            // Make goToNextSlide available globally for continue buttons
+            window.goToNextSlide = goToNextSlide;
+
+            // Show answer functionality
+            document.querySelectorAll('.show-answer-btn').forEach(button => {
+                button.addEventListener('click', function() {
+                    const answerText = this.nextElementSibling;
+                    if (answerText && answerText.classList.contains('correct-answer-text')) {
+                        answerText.style.display = 'block';
+                        this.style.display = 'none'; // Optionally hide the button after showing answer
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
